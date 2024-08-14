@@ -9,5 +9,8 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_secret_key')
 
 @app.route('/')
 def index():
-    return "Hello, World!"
+    return render_template('index.html')
+
+if __name__ == '__main__':
+	app.run(debug=True)
 
