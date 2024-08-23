@@ -1,29 +1,26 @@
 [tool.poetry]
 name = "hexlet-code"
 version = "0.1.0"
-description = "Page Analyzer is a site that analyzes specified pages for SEO suitability, similar to PageSpeed ​​Insights."
-authors = ["zhukata <https://github.com/zhukata>"]
-readme = "README.md"
+description = ""
+authors = [""]
 packages = [
-  { include = "page_analyzer" },
+    { include = "page_analyzer" }
 ]
 
+
 [tool.poetry.dependencies]
-python = "^3.10"
-gunicorn = "^22.0.0"
-python-dotenv = "^1.0.1"
+python = "^3.8"
+flask = "^3.0.0"
+gunicorn = "^20.1.0"
+python-dotenv = "^1.0.0"
 psycopg2-binary = "^2.9.9"
-validators = "^0.28.3"
-datetime = "^5.5"
-requests = "^2.32.3"
-bs4 = "^0.0.2"
-Flask = "^3.0.3"
+validators = "^0.22.0"
+requests = "^2.31.0"
+beautifulsoup4 = "^4.12.3"
 
-[tool.poetry.group.dev.dependencies]
-
-flake8 = "^7.1.0"
-
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
