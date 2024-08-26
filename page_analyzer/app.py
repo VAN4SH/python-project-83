@@ -11,7 +11,7 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY')
+app.secret_key = os.getenv('7c5aa61654fdbd2a939c6bebb12b14a6')
 
 
 @app.route('/')
