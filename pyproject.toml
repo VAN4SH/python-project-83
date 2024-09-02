@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "hexlet-code"
 version = "0.1.0"
-description = ""
-authors = [""]
+description = "Page Analyzer"
+authors = ["Ivan VAN4SH <dmitrievivana434@gmail.com>"]
 packages = [
     { include = "page_analyzer" }
 ]
