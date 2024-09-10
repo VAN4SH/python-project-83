@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-make install && psql -U username -h hostname -p 5432 -d dbname -f database.sql
+make install && psql -a -d $DATABASE_URL -f database.sql
 
