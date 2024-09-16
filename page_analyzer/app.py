@@ -24,20 +24,25 @@ def main_page():
 
 
 @app.post('/urls')
-def add_url():
-
-    url_to_add = request.form.get('url')
+def normalize_url(url_to_add):
     parsed_url = urlparse(url_to_add)
-    normalized_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    return f"{parsed_url.scheme}://{parsed_url.netloc}"
+
+
+def add_url():
+    url_to_add = request.form.get('url')
+    normalized_url = normalize_url(url_to_add)
+    
     if not validate_url(normalized_url):
         flash('Некорректный URL', 'danger')
         messages = get_flashed_messages(with_categories=True)
-        return render_template('index.html', messages=messages), 422
-
+        return render_template('main_page.html', messages=messages), 422
+    
     url = db_tools.get_url_by('name', normalized_url)
     if url:
         flash('Страница уже существует', 'warning')
         return redirect(url_for('url_page', id=url.id))
+    
     url = db_tools.insert_url(normalized_url)
     flash('Страница успешно добавлена', 'success')
     return redirect(url_for('url_page', id=url.id))
