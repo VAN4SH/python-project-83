@@ -11,15 +11,21 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 def db_connect():
     return psycopg2.connect(DATABASE_URL)
+    pass
+
+def db_execute_without_conn(query, fetch=True, fetchall=False):
+    if conn is None:
+        with db_connect() as conn:
+            return db_execute_with_conn(query, fetch, fetchall, conn)
+    return db_execute_with_conn(query, fetch, fetchall, conn)
 
 
-def db_execute(query, fetch=True, fetchall=False):
-    with db_connect() as conn:
-        cursor = conn.cursor(cursor_factory=NamedTupleCursor)
-        cursor.execute(query)
-        if fetchall:
-            return cursor.fetchall()
-        return cursor.fetchone() if fetch else None
+def db_execute(query, fetch=True, fetchall=False, conn):
+    cursor = conn.cursor(cursor_factory=NamedTupleCursor)
+    cursor.execute(query)
+    if fetchall:
+        return cursor.fetchall()
+    return cursor.fetchone() if fetch else None
 
 
 def get_url_by(param, value, from_db='urls'):
