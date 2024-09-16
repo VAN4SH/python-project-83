@@ -1,9 +1,11 @@
 import psycopg2
 from psycopg2.extras import NamedTupleCursor
 import os
+from dotenv import load_dotenv
 import datetime
 
 
+load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
