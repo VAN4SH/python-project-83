@@ -9,7 +9,7 @@ def db_connect(app):
 
 def db_execute(query, fetch=True, fetchall=False):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
-	cursor.execute(query)
+		cursor.execute(query)
         if fetchall:
             return cursor.fetchall()
         return cursor.fetchone() if fetch else None
