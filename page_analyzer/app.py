@@ -1,12 +1,11 @@
 from flask import (Flask, render_template, request, redirect,
-                   url_for, flash, get_flashed_messages)
+                   url_for, flash)
 import os
 from urllib.parse import urlparse
 from validators.url import url as validate_url
 from dotenv import load_dotenv
 from . import db_tools, url_parsing
 import requests
-
 
 load_dotenv()
 
@@ -21,23 +20,16 @@ def normalize_url(url):
 
 @app.route('/')
 def main_page():
-    messages = get_flashed_messages(with_categories=True)
-    return render_template(
-        'index.html',
-        messages=messages
-    )
+    return render_template('index.html')
 
 
 @app.post('/urls')
 def add_url():
-
     url_to_add = request.form.get('url')
-    normalized_url = normalize_url(url_to_add)
+    normalized_url = normalize_url(url_to_add) 
     if not validate_url(normalized_url):
         flash('Некорректный URL', 'danger')
-        messages = get_flashed_messages(with_categories=True)
-        return render_template('index.html', messages=messages), 422
-
+        return render_template('index.html'), 422
     url = db_tools.get_url_by('name', normalized_url)
     if url:
         flash('Страница уже существует', 'warning')
@@ -49,30 +41,27 @@ def add_url():
 
 @app.get('/urls')
 def urls():
-    messages = get_flashed_messages(with_categories=True)
     urls = db_tools.get_all_urls()
-    return render_template('urls.html', messages=messages,
-                           urls=urls)
+    return render_template('urls.html', urls=urls)
 
 
 @app.get('/urls/<int:id>')
 def url_page(id):
-    messages = get_flashed_messages(with_categories=True)
     url = db_tools.get_url_by('id', id)
     url_checks = db_tools.get_url_checks(id)
     if not url:
         flash('Запрашиваемая страница не найдена', 'warning')
         return redirect(url_for('index'), 404)
-    return render_template('url_page.html', messages=messages,
-                           url=url, url_checks=url_checks)
+    return render_template('url_page.html', url=url, url_checks=url_checks)
 
 
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
-    url_name = db_tools.get_url_by('id', id).name
-    if not url_name:
+    url_data = db_tools.get_url_by('id', id)
+    if not url_data:
         flash('Запрашиваемая страница не найдена', 'warning')
         return redirect(url_for('index'))
+    url_name = url_data.name
 
     try:
         response = requests.get(url_name)
@@ -80,7 +69,6 @@ def check_url(id):
     except requests.exceptions.RequestException:
         flash('Произошла ошибка при проверке', 'danger')
         return redirect(url_for('url_page', id=id))
-
     db_tools.add_url_check(id, url_parsing.get_url_data(response))
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('url_page', id=id))
