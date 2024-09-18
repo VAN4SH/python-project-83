@@ -49,7 +49,7 @@ def add_url():
     if url:
         flash("Страница уже существует", "warning")
         return redirect(url_for("url_page", id=url.id))
-    url = db_tools.insert_url(normalized_url)
+    url = db_tools.insert_url(normalized_url, connection)
     flash("Страница успешно добавлена", "success")
     return redirect(url_for("url_page", id=url.id))
 
