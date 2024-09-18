@@ -5,12 +5,16 @@ from dotenv import load_dotenv
 import datetime
 
 
-def db_connect(database_url):
-    return psycopg2.connect(database_url)
+load_dotenv()
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+
+def db_connect():
+    return psycopg2.connect(DATABASE_URL)
 
 
 def db_execute(query, fetch=True, fetchall=False):
-    with db_connect(database_url) as conn:
+    with db_connect() as conn:
         cursor = conn.cursor(cursor_factory=NamedTupleCursor)
         cursor.execute(query)
         if fetchall:
@@ -18,13 +22,13 @@ def db_execute(query, fetch=True, fetchall=False):
         return cursor.fetchone() if fetch else None
 
 
-def get_url_by(param, value, database_url, from_db='urls'):
+def get_url_by(param, value, from_db='urls'):
     return db_execute(
         f"""SELECT * FROM {from_db} WHERE {param} = '{value}'"""
     )
 
 
-def get_all_urls(database_url):
+def get_all_urls():
     urls = db_execute(
         "SELECT id, name FROM urls ORDER BY id DESC",
         fetchall=True
@@ -45,7 +49,7 @@ def get_all_urls(database_url):
     return data
 
 
-def insert_url(name, database_url):
+def insert_url(name):
     date = datetime.date.today()
     db_execute(
         f"""INSERT INTO urls (name, created_at)
@@ -55,7 +59,7 @@ def insert_url(name, database_url):
     return get_url_by('name', name)
 
 
-def add_url_check(url_id, data, database_url):
+def add_url_check(url_id, data):
     date = datetime.date.today()
     db_execute(
         f"""INSERT INTO url_checks (url_id, status_code,
@@ -69,7 +73,7 @@ def add_url_check(url_id, data, database_url):
     return get_url_by('id', url_id, from_db='url_checks')
 
 
-def get_url_checks(url_id, database_url, fetchall=True):
+def get_url_checks(url_id, fetchall=True):
     return db_execute(
         f"""SELECT * FROM url_checks WHERE url_id = '{url_id}'
             ORDER BY id DESC
