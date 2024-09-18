@@ -28,7 +28,7 @@ def normalize_url(url):
 
 
 @app.route("/")
-def main_page():
+def index():
     connection = db_tools.db_connect(app)
     messages = get_flashed_messages(with_categories=True)
     return render_template("index.html", messages=messages)
