@@ -1,7 +1,5 @@
 import psycopg2
 from psycopg2.extras import NamedTupleCursor
-import os
-from dotenv import load_dotenv
 import datetime
 
 
@@ -10,27 +8,29 @@ def db_connect(app):
 
 
 def db_execute(query, fetch=True, fetchall=False):
-    with db_connect() as conn:
-        cursor = conn.cursor(cursor_factory=NamedTupleCursor)
-        cursor.execute(query)
+    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+	cursor.execute(query)
         if fetchall:
             return cursor.fetchall()
         return cursor.fetchone() if fetch else None
 
 
-def get_url_by(param, value, from_db='urls'):
+def get_url_by(param, value, connection, from_db='urls'):
     return db_execute(
         f"""SELECT * FROM {from_db} WHERE {param} = '{value}'"""
+	connection=connection
     )
 
 
-def get_all_urls():
+def get_all_urls(app, connection):
     urls = db_execute(
         "SELECT id, name FROM urls ORDER BY id DESC",
+	connection=connection,
         fetchall=True
     )
     all_checks = db_execute(
         "SELECT * FROM url_checks ORDER BY id DESC",
+	connection=connection,
         fetchall=True
     )
     data = []
@@ -45,17 +45,18 @@ def get_all_urls():
     return data
 
 
-def insert_url(name):
+def insert_url(name, connection):
     date = datetime.date.today()
     db_execute(
         f"""INSERT INTO urls (name, created_at)
             VALUES ('{name}', '{date}')""",
+	connection=connection,
         fetch=False
     )
-    return get_url_by('name', name)
+    return get_url_by('name', name, connection=connection)
 
 
-def add_url_check(url_id, data):
+def add_url_check(url_id, data, connection):
     date = datetime.date.today()
     db_execute(
         f"""INSERT INTO url_checks (url_id, status_code,
@@ -64,15 +65,17 @@ def add_url_check(url_id, data):
                 '{data['h1']}', '{data['title']}',
                 '{data['description']}', '{date}') ;
             """,
+	connection=connection,
         fetch=False
     )
-    return get_url_by('id', url_id, from_db='url_checks')
+    return get_url_by('id', url_id, connection=connection, from_db='url_checks')
 
 
-def get_url_checks(url_id, fetchall=True):
+def get_url_checks(url_id, connection, fetchall=True):
     return db_execute(
         f"""SELECT * FROM url_checks WHERE url_id = '{url_id}'
             ORDER BY id DESC
             """,
+	connection=connection
         fetchall=fetchall
     )
