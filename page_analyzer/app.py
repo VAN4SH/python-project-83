@@ -29,7 +29,6 @@ def normalize_url(url):
 
 @app.route("/")
 def main_page():
-    connection = db_tools.db_connect(app)
     messages = get_flashed_messages(with_categories=True)
     return render_template('main_page.html', messages=messages)
 
@@ -58,7 +57,7 @@ def add_url():
 def urls():
     connection = db_tools.db_connect(app)
     messages = get_flashed_messages(with_categories=True)
-    urls = db_tools.get_all_urls()
+    urls = db_tools.get_all_urls(connection=connection)
     return render_template('urls.html', messages=messages, urls=urls)
 
 
