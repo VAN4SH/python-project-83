@@ -9,7 +9,7 @@ import requests
 
 
 load_dotenv()
-
+app.database_url = os.getenv('DATABASE_URL')
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
