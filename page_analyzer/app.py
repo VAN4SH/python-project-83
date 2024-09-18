@@ -14,6 +14,11 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
 
+def normalize_url(url):
+    parsed_url = urlparse(url)
+    return f"{parsed_url.scheme}://{parsed_url.netloc}"
+
+
 @app.route('/')
 def main_page():
     messages = get_flashed_messages(with_categories=True)
@@ -27,8 +32,7 @@ def main_page():
 def add_url():
 
     url_to_add = request.form.get('url')
-    parsed_url = urlparse(url_to_add)
-    normalized_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    normalized_url = normalize_url(url_to_add)
     if not validate_url(normalized_url):
         flash('Некорректный URL', 'danger')
         messages = get_flashed_messages(with_categories=True)
