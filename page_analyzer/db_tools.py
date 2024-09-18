@@ -10,7 +10,7 @@ def db_connect(app):
 
 
 def db_execute(query, fetch=True, fetchall=False):
-    with db_connect(app) as conn:
+    with db_connect() as conn:
         cursor = conn.cursor(cursor_factory=NamedTupleCursor)
         cursor.execute(query)
         if fetchall:
