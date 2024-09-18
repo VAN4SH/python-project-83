@@ -21,21 +21,18 @@ def db_execute(conn, query, fetch=True, fetchall=False):
         return cursor.fetchone() if fetch else None
 
 
-def get_url_by(conn, param, value, from_db='urls'):
+def get_url_by(param, value, from_db='urls'):
     return db_execute(
-        conn,
         f"""SELECT * FROM {from_db} WHERE {param} = '{value}'"""
     )
 
 
-def get_all_urls(conn):
+def get_all_urls():
     urls = db_execute(
-        conn,
         "SELECT id, name FROM urls ORDER BY id DESC",
         fetchall=True
     )
     all_checks = db_execute(
-        conn,
         "SELECT * FROM url_checks ORDER BY id DESC",
         fetchall=True
     )
@@ -51,36 +48,38 @@ def get_all_urls(conn):
     return data
 
 
-def insert_url(conn, name):
+def insert_url(name):
     date = datetime.date.today()
     db_execute(
-        conn,
         f"""INSERT INTO urls (name, created_at)
             VALUES ('{name}', '{date}')""",
         fetch=False
     )
-    return get_url_by(conn, 'name', name)
+    return get_url_by('name', name)
 
 
-def add_url_check(conn, url_id, data):
+def add_url_check(url_id, data):
     date = datetime.date.today()
     db_execute(
-        conn,
         f"""INSERT INTO url_checks (url_id, status_code,
                 h1, title, description, created_at)
             VALUES ({url_id}, {data['status_code']},
                 '{data['h1']}', '{data['title']}',
-                '{data['description']}', '{date}')""",
+                '{data['description']}', '{date}') ;
+            """,
         fetch=False
     )
-    return get_url_by(conn, 'id', url_id, from_db='url_checks')
+    return get_url_by('id', url_id, from_db='url_checks')
 
 
-def get_url_checks(conn, url_id, fetchall=True):
+def get_url_checks(url_id, fetchall=True):
     return db_execute(
-        conn,
         f"""SELECT * FROM url_checks WHERE url_id = '{url_id}'
-            ORDER BY id DESC""",
+            ORDER BY id DESC
+            """,
         fetchall=fetchall
     )
 
+
+if __name__ == "__main__":
+    with db_connect() as conn
