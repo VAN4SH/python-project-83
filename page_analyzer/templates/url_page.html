@@ -16,7 +16,7 @@
         </tr>
         <tr>
           <td>Дата создания</td>
-          <td>{{ url.created_at }}</td>
+          <td>{{ url.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         </tr>
       </tbody>
     </table>
@@ -24,6 +24,7 @@
 
   <h2 class="mt-5 mb-3">Проверки</h2>
   <form action="{{ url_for('check_url', id=url.id) }}" method="post">
+    {{ csrf_token() }}
     <input type="submit" class="btn btn-secondary" value="Запустить проверку">
   </form>
 
@@ -40,14 +41,18 @@
         </tr>
       </thead>
       <tbody>
-        {% for check in url_checks %}
+        {% for check in url.url_checks %}
         <tr>
           <td>{{ check.id }}</td>
-          <td>{{ check.status_code }}</td>
-          <td>{{ check.h1 }}</td>
-          <td>{{ check.title }}</td>
-          <td>{{ check.description }}</td>
-          <td>{{ check.created_at }}</td>
+          <td>{{ check.status_code or '—' }}</td>
+          <td>{{ check.h1 or '—' }}</td>
+          <td>{{ check.title or '—' }}</td>
+          <td>{{ check.description[:50] }}{% if check.description|length > 50 %}...{% endif %}</td>
+          <td>{{ check.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center">Проверки отсутствуют</td>
         </tr>
         {% endfor %}
       </tbody>
