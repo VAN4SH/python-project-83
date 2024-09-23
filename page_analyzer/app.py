@@ -61,7 +61,7 @@ def url_page(id):
     url_checks = db_tools.get_url_checks(id, connection=connection)
     if not url:
         flash("Запрашиваемая страница не найдена", "warning")
-        return redirect(url_for("main_page")), 404
+        return redirect(url_for("main_page"))
     return render_template("url_page.html", url=url, url_checks=url_checks)
 
 
