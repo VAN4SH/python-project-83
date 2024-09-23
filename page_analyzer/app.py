@@ -50,7 +50,7 @@ def add_url():
 @app.route("/urls", methods=["GET"])
 def urls():
     connection = db_tools.db_connect(app)
-    urls = db_tools.get_all_urls(connection=connection)
+    urls = db_tools.get_all_urls(app, connection=connection)
     return render_template("urls.html", urls=urls)
 
 
