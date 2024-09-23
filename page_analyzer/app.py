@@ -11,7 +11,7 @@ import os
 from urllib.parse import urlparse
 from validators.url import url as validate_url
 from dotenv import load_dotenv
-from . import db_tools, url_parsing
+from . import db_tools,url_parsing
 import requests
 
 
@@ -24,11 +24,10 @@ app.database_url = os.getenv("DATABASE_URL")
 
 @app.route("/")
 def main_page():
-    messages = get_flashed_messages(with_categories=True)
-    return render_template("main_page.html", messages=messages)
+    return render_template("main_page.html")
 
 
-@app.post("/urls")
+@app.route("/urls", methods=["POST"])
 def add_url():
     connection = db_tools.db_connect(app)
 
@@ -37,8 +36,7 @@ def add_url():
     normalized_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
     if not validate_url(normalized_url):
         flash("Некорректный URL", "danger")
-        messages = get_flashed_messages(with_categories=True)
-        return render_template("main_page.html", messages=messages), 422
+        return render_template("main_page.html"), 422
 
     url = db_tools.get_url_by("name", normalized_url, connection=connection)
     if url:
@@ -49,36 +47,34 @@ def add_url():
     return redirect(url_for("url_page", id=url.id))
 
 
-@app.get("/urls")
+@app.route("/urls", methods=["GET"])
 def urls():
     connection = db_tools.db_connect(app)
-    messages = get_flashed_messages(with_categories=True)
     urls = db_tools.get_all_urls(connection=connection)
-    return render_template("urls.html", messages=messages, urls=urls)
+    return render_template("urls.html", urls=urls)
 
 
-@app.get("/urls/<int:id>")
+@app.route("/urls/<int:id>", methods=["GET"])
 def url_page(id):
     connection = db_tools.db_connect(app)
-    messages = get_flashed_messages(with_categories=True)
     url = db_tools.get_url_by("id", id, connection=connection)
     url_checks = db_tools.get_url_checks(id, connection=connection)
     if not url:
         flash("Запрашиваемая страница не найдена", "warning")
-        return redirect(url_for("main_page"), 404)
-    return render_template(
-        "url_page.html", messages=messages, url=url, url_checks=url_checks
-    )
+        return redirect(url_for("main_page")), 404
+    return render_template("url_page.html", url=url, url_checks=url_checks)
 
 
-@app.post("/urls/<int:id>/checks")
+@app.route("/urls/<int:id>/checks", methods=["POST"])
 def check_url(id):
     connection = db_tools.db_connect(app)
 
-    url_name = db_tools.get_url_by("id", id, connection=connection).name
-    if not url_name:
+    url_rec = db_tools.get_url_by("id", id, connection=connection)
+    if not url_rec:
         flash("Запрашиваемая страница не найдена", "warning")
         return redirect(url_for("main_page"))
+
+    url_name = url_rec.name
 
     try:
         response = requests.get(url_name)
