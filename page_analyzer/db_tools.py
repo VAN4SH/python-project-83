@@ -54,6 +54,7 @@ def insert_url(name, connection):
         connection=connection,
         fetch=False,
     )
+    connection.commit()
     return get_url_by("name", name, connection=connection)
 
 
@@ -69,6 +70,7 @@ def add_url_check(url_id, data, connection):
         connection=connection,
         fetch=False,
     )
+    connection.commit()
     return get_url_by("id", url_id, connection=connection, from_db="url_checks")
 
 
