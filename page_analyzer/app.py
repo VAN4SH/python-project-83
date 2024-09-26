@@ -35,7 +35,7 @@ def add_url():
 
     if not validate_url(normalized_url):
         flash("Некорректный URL", "danger")
-	messages = get_flashed_messages(with_categories=True)
+        messages = get_flashed_messages(with_categories=True)
         return render_template("main_page.html"), 422
 
     with db_tools.db_connect(app) as connection:
