@@ -23,6 +23,7 @@ app.database_url = os.getenv("DATABASE_URL")
 
 @app.route("/")
 def main_page():
+    messages = get_flashed_messages(with_categories=True)
     return render_template("main_page.html")
 
 
@@ -34,6 +35,7 @@ def add_url():
 
     if not validate_url(normalized_url):
         flash("Некорректный URL", "danger")
+	messages = get_flashed_messages(with_categories=True)
         return render_template("main_page.html"), 422
 
     with db_tools.db_connect(app) as connection:
@@ -50,6 +52,7 @@ def add_url():
 
 @app.route("/urls", methods=["GET"])
 def urls():
+    messages = get_flashed_messages(with_categories=True)
     with db_tools.db_connect(app) as connection:
         urls = db_tools.get_all_urls(app, connection=connection)
     return render_template("urls.html", urls=urls)
@@ -57,6 +60,7 @@ def urls():
 
 @app.route("/urls/<int:id>", methods=["GET"])
 def url_page(id):
+    messages = get_flashed_messages(with_categories=True)
     with db_tools.db_connect(app) as connection:
         url = db_tools.get_url_by("id", id, connection=connection)
         url_checks = db_tools.get_url_checks(id, connection=connection)
@@ -65,7 +69,7 @@ def url_page(id):
             flash("Запрашиваемая страница не найдена", "warning")
             return redirect(url_for("main_page"))
 
-    return render_template("url_page.html", url=url, url_checks=url_checks)
+    return render_template("url_page.html", messages=messages, url=url, url_checks=url_checks)
 
 
 @app.route("/urls/<int:id>/checks", methods=["POST"])

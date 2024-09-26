@@ -25,13 +25,15 @@
   </header>
   {% endblock %}
 
- {% with messages = get_flashed_messages(with_categories=True) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert {{ category }}" role="alert">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+  {% block flashes %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }}" role="alert">
+    {{ message }}
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endblock %}
 
   <main class="flex-grow-1">
     {% block content %}
