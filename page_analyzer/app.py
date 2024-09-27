@@ -69,34 +69,29 @@ def url_page(id):
             flash("Запрашиваемая страница не найдена", "warning")
             return redirect(url_for("main_page"))
 
-    return render_template("url_page.html", messages=messages, url=url, url_checks=url_checks)
+    return render_template(
+        "url_page.html", messages=messages, url=url, url_checks=url_checks
+    )
 
 
 @app.route("/urls/<int:id>/checks", methods=["POST"])
 def check_url(id):
-    url_rec = None
-    url_name = None
-
     with db_tools.db_connect(app) as connection:
-        url_rec = db_tools.get_url_by("id", id, connection=connection)
-
-        if not url_rec:
+        url_name = db_tools.get_url_by("id", id, connection=connection).name
+        if not url_name:
             flash("Запрашиваемая страница не найдена", "warning")
             return redirect(url_for("main_page"))
 
-        url_name = url_rec.name
+        try:
+            response = requests.get(url_name)
+            response.raise_for_status()
+        except requests.exceptions.RequestException:
+            flash("Произошла ошибка при проверке", "danger")
+            return redirect(url_for("url_page", id=id))
 
-    try:
-        response = requests.get(url_name)
-        response.raise_for_status()
-    except requests.exceptions.RequestException:
-        flash("Произошла ошибка при проверке", "danger")
-        return redirect(url_for("url_page", id=id))
-
-    with db_tools.db_connect(app) as connection:
         db_tools.add_url_check(
-            id, url_parsing.get_url_data(response), connection=connection
+            id, url_parsing.get_url_data(response), connection=connectio
         )
+        flash("Страница успешно проверена", "success")
 
-    flash("Страница успешно проверена", "success")
     return redirect(url_for("url_page", id=id))
