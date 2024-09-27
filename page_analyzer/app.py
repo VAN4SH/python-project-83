@@ -90,7 +90,7 @@ def check_url(id):
             return redirect(url_for("url_page", id=id))
 
         db_tools.add_url_check(
-            id, url_parsing.get_url_data(response), connection=connectio
+            id, url_parsing.get_url_data(response), connection=connection
         )
         flash("Страница успешно проверена", "success")
 
