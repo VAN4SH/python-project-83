@@ -24,7 +24,7 @@ app.database_url = os.getenv("DATABASE_URL")
 @app.route("/")
 def main_page():
     messages = get_flashed_messages(with_categories=True)
-    return render_template("main_page.html")
+    return render_template("main_page.html", messages=messages)
 
 
 @app.route("/urls", methods=["POST"])
