@@ -14,27 +14,20 @@
       </thead>
       <tbody>
         {% for url in urls %}
-        {% set last_check = url.url_checks|first %}
         <tr>
-          <td>{{ url.id }}</td>
+          <td>
+            {{ url.id }}
+          </td>
           <td>
             <a href="{{ url_for('url_page', id=url.id) }}">
               {{ url.name }}
             </a>
           </td>
           <td>
-            {% if last_check %}
-              {{ last_check.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
-            {% else %}
-              Не проверялся
-            {% endif %}
+            {{ url.created_at }}
           </td>
           <td>
-            {% if last_check %}
-              {{ last_check.status_code }}
-            {% else %}
-              —
-            {% endif %}
+            {{ url.status_code }}
           </td>
         </tr>
         {% endfor %}
