@@ -27,9 +27,9 @@ def normalize_url(url):
 
 
 @app.route("/")
-def main_page():
+def index():
     messages = get_flashed_messages(with_categories=True)
-    return render_template("main_page.html", messages=messages)
+    return render_template("index.html", messages=messages)
 
 
 @app.route("/urls", methods=["POST"])
@@ -39,7 +39,7 @@ def add_url():
     if not validate_url(normalized_url):
         flash("Некорректный URL", "danger")
         messages = get_flashed_messages(with_categories=True)
-        return render_template("main_page.html", messages=messages), 422
+        return render_template("index.html", messages=messages), 422
 
     with db_tools.db_connect(app) as connection:
         url = db_tools.get_url_by("name", normalized_url, connection=connection)
@@ -70,7 +70,7 @@ def url_page(id):
 
         if not url:
             flash("Запрашиваемая страница не найдена", "warning")
-            return redirect(url_for("main_page"))
+            return redirect(url_for("index"))
 
     return render_template(
         "url_page.html", messages=messages, url=url, url_checks=url_checks
@@ -83,7 +83,7 @@ def check_url(id):
         url_name = db_tools.get_url_by("id", id, connection=connection).name
         if not url_name:
             flash("Запрашиваемая страница не найдена", "warning")
-            return redirect(url_for("main_page"))
+            return redirect(url_for("index"))
 
         try:
             response = requests.get(url_name)
