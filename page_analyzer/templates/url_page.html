@@ -40,7 +40,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for check in url.url_checks %}
+        {% for check in url_checks %}
         <tr>
           <td>{{ check.id }}</td>
           <td>{{ check.status_code or '—' }}</td>
