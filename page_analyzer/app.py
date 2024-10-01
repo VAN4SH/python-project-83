@@ -8,7 +8,6 @@ from flask import (
     get_flashed_messages,
 )
 import os
-from urllib.parse import urlparse
 from validators.url import url as validate_url
 from dotenv import load_dotenv
 from . import db, url_parsing
