@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 
 
 def get_url_data(response):
