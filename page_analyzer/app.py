@@ -5,7 +5,6 @@ from flask import (
     redirect,
     url_for,
     flash,
-    get_flashed_messages,
 )
 import os
 from validators.url import url as validate_url
@@ -22,8 +21,7 @@ app.database_url = os.getenv("DATABASE_URL")
 
 @app.get("/")
 def index():
-    messages = get_flashed_messages(with_categories=True)
-    return render_template("index.html", messages=messages)
+    return render_template("index.html")
 
 
 @app.post("/urls")
@@ -32,8 +30,7 @@ def add_url():
     normalized_url = url_parsing.normalize_url(url_to_add)
     if not validate_url(normalized_url):
         flash("Некорректный URL", "danger")
-        messages = get_flashed_messages(with_categories=True)
-        return render_template("index.html", messages=messages), 422
+        return render_template("index.html"), 422
 
     with db.db_connect(app) as connection:
         url = db.get_url_by("name", normalized_url, connection=connection)
@@ -49,15 +46,13 @@ def add_url():
 
 @app.get("/urls")
 def urls():
-    messages = get_flashed_messages(with_categories=True)
     with db.db_connect(app) as connection:
         urls = db.get_all_urls(app, connection=connection)
-    return render_template("urls.html", urls=urls, messages=messages)
+    return render_template("urls.html", urls=urls)
 
 
 @app.get("/urls/<int:id>")
 def url_page(id):
-    messages = get_flashed_messages(with_categories=True)
     with db.db_connect(app) as connection:
         url = db.get_url_by("id", id, connection=connection)
         url_checks = db.get_url_checks(id, connection=connection)
@@ -67,7 +62,7 @@ def url_page(id):
             return redirect(url_for("index"))
 
     return render_template(
-        "url_page.html", messages=messages, url=url, url_checks=url_checks
+        "url_page.html", url=url, url_checks=url_checks
     )
 
 
