@@ -22,25 +22,30 @@ def get_url_by(param, value, connection, from_db="urls"):
 
 
 def get_all_urls(app, connection):
-    urls = db_execute(
-        "SELECT id, name FROM urls ORDER BY id DESC",
-        connection=connection,
-        fetchall=True,
-    )
-    all_checks = db_execute(
-        "SELECT * FROM url_checks ORDER BY id DESC",
+    query = """
+        SELECT DISTINCT ON (urls.id)
+            urls.id,
+            urls.name,
+            url_checks.status_code,
+            url_checks.created_at
+        FROM urls
+        LEFT JOIN url_checks
+        ON urls.id = url_checks.url_id
+        ORDER BY urls.id DESC, url_checks.created_at DESC NULLS LAST
+    """
+    rows = db_execute(
+        query,
         connection=connection,
         fetchall=True,
     )
     data = []
-    for url in urls:
-        url_checks = [check for check in all_checks if check.url_id == url.id]
+    for row in rows:
         data.append(
             {
-                "id": url.id,
-                "name": url.name,
-                "status_code": url_checks[0].status_code if url_checks else "",
-                "created_at": url_checks[0].created_at if url_checks else "",
+                "id": row.id,
+                "name": row.name,
+                "status_code": row.status_code if row.status_code is not None else "",
+                "created_at": row.created_at if row.created_at is not None else "",
             }
         )
     return data
@@ -82,3 +87,4 @@ def get_url_checks(url_id, connection, fetchall=True):
         connection=connection,
         fetchall=fetchall,
     )
+
