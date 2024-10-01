@@ -54,7 +54,7 @@ def add_url():
 
 
 @app.get("/urls")
-def urls():
+def get_urls():
     messages = get_flashed_messages(with_categories=True)
     with db.db_connect(app) as connection:
         urls = db.get_all_urls(app, connection=connection)
