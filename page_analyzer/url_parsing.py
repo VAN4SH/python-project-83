@@ -12,3 +12,8 @@ def get_url_data(response):
     if soup.meta.get('name') == 'description':
         url_data['description'] = soup.meta.get('content', '')
     return url_data
+
+
+def normalize_url(url):
+    parsed_url = urlparse(url)
+    return f"{parsed_url.scheme}://{parsed_url.netloc}"
