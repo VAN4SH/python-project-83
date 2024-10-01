@@ -26,13 +26,13 @@ def normalize_url(url):
     return f"{parsed_url.scheme}://{parsed_url.netloc}"
 
 
-@app.route("/")
+@app.get("/")
 def index():
     messages = get_flashed_messages(with_categories=True)
     return render_template("index.html", messages=messages)
 
 
-@app.route("/urls", methods=["POST"])
+@app.post("/urls")
 def add_url():
     url_to_add = request.form.get("url")
     normalized_url = normalize_url(url_to_add)
@@ -53,7 +53,7 @@ def add_url():
     return redirect(url_for("url_page", id=url.id))
 
 
-@app.route("/urls", methods=["GET"])
+@app.get("/urls")
 def urls():
     messages = get_flashed_messages(with_categories=True)
     with db_tools.db_connect(app) as connection:
@@ -61,7 +61,7 @@ def urls():
     return render_template("urls.html", urls=urls, messages=messages)
 
 
-@app.route("/urls/<int:id>", methods=["GET"])
+@app.get("/urls/<int:id>")
 def url_page(id):
     messages = get_flashed_messages(with_categories=True)
     with db_tools.db_connect(app) as connection:
@@ -77,7 +77,7 @@ def url_page(id):
     )
 
 
-@app.route("/urls/<int:id>/checks", methods=["POST"])
+@app.post("/urls/<int:id>/checks")
 def check_url(id):
     with db_tools.db_connect(app) as connection:
         url_name = db_tools.get_url_by("id", id, connection=connection).name
