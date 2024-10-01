@@ -87,4 +87,3 @@ def get_url_checks(url_id, connection, fetchall=True):
         connection=connection,
         fetchall=fetchall,
     )
-
