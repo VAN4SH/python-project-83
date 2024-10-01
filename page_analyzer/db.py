@@ -58,7 +58,7 @@ def insert_url(name, connection):
     return get_url_by("name", name, connection=connection)
 
 
-def add_url_check(url_id, data, connection):
+def insert_url_check(url_id, data, connection):
     date = datetime.date.today()
     db_execute(
         f"""INSERT INTO url_checks (url_id, status_code,

@@ -92,7 +92,7 @@ def check_url(id):
             flash("Произошла ошибка при проверке", "danger")
             return redirect(url_for("url_page", id=id))
 
-        db.add_url_check(
+        db.insert_url_check(
             id, url_parsing.get_url_data(response), connection=connection
         )
         flash("Страница успешно проверена", "success")
