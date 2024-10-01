@@ -54,11 +54,11 @@ def add_url():
 
 
 @app.get("/urls")
-def get_urls():
+def urls():
     messages = get_flashed_messages(with_categories=True)
     with db.db_connect(app) as connection:
-        get_urls = db.get_all_urls(app, connection=connection)
-    return render_template("urls.html", get_urls=get_urls, messages=messages)
+        urls = db.get_all_urls(app, connection=connection)
+    return render_template("urls.html", urls=urls, messages=messages)
 
 
 @app.get("/urls/<int:id>")
