@@ -46,7 +46,7 @@ def add_url():
 
 
 @app.get("/urls")
-def urls():
+def get_urls():
     connection = db.db_connect(app)
     with connection:
         urls = db.get_all_urls(app, connection=connection)
