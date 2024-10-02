@@ -32,7 +32,8 @@ def add_url():
         flash("Некорректный URL", "danger")
         return render_template("index.html"), 422
 
-    with db.db_connect(app) as connection:
+    connection = db.db_connect(app)
+    with connection:
         url = db.get_url_by("name", normalized_url, connection=connection)
         if url:
             flash("Страница уже существует", "warning")
@@ -46,14 +47,16 @@ def add_url():
 
 @app.get("/urls")
 def urls():
-    with db.db_connect(app) as connection:
+    connection = db.db_connect(app)
+    with connection:
         urls = db.get_all_urls(app, connection=connection)
     return render_template("urls.html", urls=urls)
 
 
 @app.get("/urls/<int:id>")
 def url_page(id):
-    with db.db_connect(app) as connection:
+    connection = db.db_connect(app)
+    with connection:
         url = db.get_url_by("id", id, connection=connection)
         url_checks = db.get_url_checks(id, connection=connection)
 
@@ -61,19 +64,19 @@ def url_page(id):
             flash("Запрашиваемая страница не найдена", "warning")
             return redirect(url_for("index"))
 
-    return render_template(
-        "url_page.html", url=url, url_checks=url_checks
-    )
+    return render_template("url_page.html", url=url, url_checks=url_checks)
 
 
 @app.post("/urls/<int:id>/checks")
 def check_url(id):
-    with db.db_connect(app) as connection:
-        url_name = db.get_url_by("id", id, connection=connection).name
-        if not url_name:
+    connection = db.db_connect(app)
+    with connection:
+        url_data = db.get_url_by("id", id, connection=connection)
+        if not url_data:
             flash("Запрашиваемая страница не найдена", "warning")
             return redirect(url_for("index"))
 
+        url_name = url_data.name
         try:
             response = requests.get(url_name)
             response.raise_for_status()
