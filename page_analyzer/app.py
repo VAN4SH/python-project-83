@@ -37,12 +37,12 @@ def add_url():
         url = db.get_url_by("name", normalized_url, connection=connection)
         if url:
             flash("Страница уже существует", "warning")
-            return redirect(url_for("url_page", id=url.id))
+            return redirect(url_for("get_url", id=url.id))
 
         url = db.insert_url(normalized_url, connection)
 
     flash("Страница успешно добавлена", "success")
-    return redirect(url_for("url_page", id=url.id))
+    return redirect(url_for("get_url", id=url.id))
 
 
 @app.get("/urls")
@@ -82,11 +82,11 @@ def check_url(id):
             response.raise_for_status()
         except requests.exceptions.RequestException:
             flash("Произошла ошибка при проверке", "danger")
-            return redirect(url_for("url_page", id=id))
+            return redirect(url_for("get_url", id=id))
 
         db.insert_url_check(
             id, url_parsing.get_url_data(response), connection=connection
         )
         flash("Страница успешно проверена", "success")
 
-    return redirect(url_for("url_page", id=id))
+    return redirect(url_for("get_url", id=id))
