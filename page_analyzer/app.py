@@ -31,16 +31,14 @@ def add_url():
     if not validate_url(normalized_url):
         flash("Некорректный URL", "danger")
         return render_template("index.html"), 422
-
+    
     connection = db.db_connect(app)
-    with connection:
-        url = db.get_url_by("name", normalized_url, connection=connection)
-        if url:
-            flash("Страница уже существует", "warning")
-            return redirect(url_for("get_url", id=url.id))
+    url = db.get_url_by("name", normalized_url, connection)
+    if url:
+        flash("Страница уже существует", "warning")
+        return redirect(url_for("get_url", id=url.id))
 
-        url = db.insert_url(normalized_url, connection)
-
+    db.insert_url(normalized_url, connection)
     flash("Страница успешно добавлена", "success")
     return redirect(url_for("get_url", id=url.id))
 
@@ -48,21 +46,19 @@ def add_url():
 @app.get("/urls")
 def get_urls():
     connection = db.db_connect(app)
-    with connection:
-        urls = db.get_all_urls(app, connection=connection)
+    urls = db.get_all_urls(app, connection)
     return render_template("urls.html", urls=urls)
 
 
 @app.get("/urls/<int:id>")
 def get_url(id):
     connection = db.db_connect(app)
-    with connection:
-        url = db.get_url_by("id", id, connection=connection)
-        url_checks = db.get_url_checks(id, connection=connection)
+    url = db.get_url_by("id", id, connection)
+    url_checks = db.get_url_checks(id, connection)
 
-        if not url:
-            flash("Запрашиваемая страница не найдена", "warning")
-            return redirect(url_for("index"))
+    if not url:
+        flash("Запрашиваемая страница не найдена", "warning")
+        return redirect(url_for("index"))
 
     return render_template("url_page.html", url=url, url_checks=url_checks)
 
@@ -70,23 +66,22 @@ def get_url(id):
 @app.post("/urls/<int:id>/checks")
 def check_url(id):
     connection = db.db_connect(app)
-    with connection:
-        url_data = db.get_url_by("id", id, connection=connection)
-        if not url_data:
-            flash("Запрашиваемая страница не найдена", "warning")
-            return redirect(url_for("index"))
+    url_data = db.get_url_by("id", id, connection)
+    if not url_data:
+        flash("Запрашиваемая страница не найдена", "warning")
+        return redirect(url_for("index"))
 
-        url_name = url_data.name
-        try:
-            response = requests.get(url_name)
-            response.raise_for_status()
-        except requests.exceptions.RequestException:
-            flash("Произошла ошибка при проверке", "danger")
-            return redirect(url_for("get_url", id=id))
+    url_name = url_data.name
+    try:
+        response = requests.get(url_name)
+        response.raise_for_status()
+    except requests.exceptions.RequestException:
+        flash("Произошла ошибка при проверке", "danger")
+        return redirect(url_for("get_url", id=id))
 
-        db.insert_url_check(
-            id, url_parsing.get_url_data(response), connection=connection
-        )
-        flash("Страница успешно проверена", "success")
+    db.insert_url_check(
+        id, url_parsing.get_url_data(response), connection
+    )
+    flash("Страница успешно проверена", "success")
 
     return redirect(url_for("get_url", id=id))
