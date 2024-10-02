@@ -54,7 +54,7 @@ def get_urls():
 
 
 @app.get("/urls/<int:id>")
-def url_page(id):
+def get_url(id):
     connection = db.db_connect(app)
     with connection:
         url = db.get_url_by("id", id, connection=connection)
