@@ -68,14 +68,14 @@ def check_url(id):
     url_name = db.get_url_by("id", id, connection=connection).name
     if not url_name:
         flash("Запрашиваемая страница не найдена", "warning")
-        return redirect(url_for("main_page"))
+        return redirect(url_for("index"))
 
     try:
         response = requests.get(url_name)
         response.raise_for_status()
     except requests.exceptions.RequestException:
         flash("Произошла ошибка при проверке", "danger")
-        return redirect(url_for("url_page", id=id))
+        return redirect(url_for("get_url", id=id))
 
     db.insert_url_check(id, url_parsing.get_url_data(response), connection=connection)
     flash("Страница успешно проверена", "success")
